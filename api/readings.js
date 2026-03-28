@@ -29,7 +29,9 @@ export default async function handler(req, res) {
       rows = await db`
         SELECT id, device_id, received_at,
                temperature, humidity, co2, pressure,
-               light_level, tvoc, pir, battery
+               light_level, tvoc, pir, battery,
+               occupancy, illuminance,
+               lai, laimax, laeq
         FROM sensor_readings
         WHERE received_at >= ${since.toISOString()}
         ORDER BY received_at ASC
@@ -39,7 +41,9 @@ export default async function handler(req, res) {
       rows = await db`
         SELECT id, device_id, received_at,
                temperature, humidity, co2, pressure,
-               light_level, tvoc, pir, battery
+               light_level, tvoc, pir, battery,
+               occupancy, illuminance,
+               lai, laimax, laeq
         FROM sensor_readings
         WHERE received_at >= ${since.toISOString()}
           AND device_id = ${device}
