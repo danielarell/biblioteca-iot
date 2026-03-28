@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblioteca IoT — Acceso</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f0f2f5; --surface: #ffffff; --border: #e2e6ed;
+      --accent: #0066ff; --accent2: #00b899;
+      --text: #111827; --muted: #6b7280;
+      --error: #ef4444; --success: #059669;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; overflow: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,102,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,102,255,.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridMove 20s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes gridMove { to { background-position: 40px 40px; } }
+    .orb { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; opacity: .18; }
+    .orb-1 { width: 400px; height: 400px; background: #bfdbfe; top: -100px; right: -100px; animation: f1 8s ease-in-out infinite; }
+    .orb-2 { width: 300px; height: 300px; background: #a7f3d0; bottom: -50px; left: -50px; animation: f2 10s ease-in-out infinite; }
+    @keyframes f1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,30px)} }
+    @keyframes f2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(20px,-20px)} }
+    .wrap {
+      position: relative; z-index: 10;
+      width: 100%; max-width: 420px; padding: 1.5rem;
+      animation: fadeUp .6s ease both;
+    }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform:none; } }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2.5rem; position: relative; overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,.08);
+    }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 2rem; }
+    .brand-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .brand-name { font-weight: 800; font-size: 1rem; letter-spacing: .05em; color: var(--text); }
+    .brand-sub  { font-size: .7rem; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; font-family: 'DM Mono', monospace; }
+    h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: .25rem; color: var(--text); }
+    .subtitle { color: var(--muted); font-size: .875rem; margin-bottom: 2rem; font-family: 'DM Mono', monospace; }
+    .field { margin-bottom: 1.25rem; }
+    label { display: block; font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: .5rem; font-family: 'DM Mono', monospace; }
+    input {
+      width: 100%; background: #f7f8fa; border: 1px solid var(--border);
+      border-radius: 10px; padding: .75rem 1rem; color: var(--text); font-size: .9rem;
+      font-family: 'Syne', sans-serif; transition: border-color .2s, box-shadow .2s; outline: none;
+    }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,102,255,.1); background: #fff; }
+    input::placeholder { color: #9ca3af; }
+    .btn {
+      width: 100%; background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none; border-radius: 10px; padding: .875rem; color: #fff;
+      font-size: .95rem; font-weight: 700; font-family: 'Syne', sans-serif;
+      cursor: pointer; letter-spacing: .05em; transition: opacity .2s, transform .15s; margin-top: .5rem;
+    }
+    .btn:hover { opacity: .9; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .msg { margin-top: 1rem; padding: .75rem 1rem; border-radius: 8px; font-size: .85rem; font-family: 'DM Mono', monospace; display: none; }
+    .msg.error   { background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; display: block; }
+    .msg.success { background: #d1fae5; border: 1px solid #6ee7b7; color: #065f46; display: block; }
+    .footer-note { text-align: center; margin-top: 1.5rem; font-size: .75rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; margin-right: 6px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="wrap">
+    <div class="card">
+      <div class="brand">
+        <div class="brand-icon">📡</div>
+        <div>
+          <div class="brand-name">Biblioteca IoT</div>
+          <div class="brand-sub">Monitor ambiental</div>
+        </div>
+      </div>
+      <h1>Bienvenido</h1>
+      <p class="subtitle">// ingresa tus credenciales para continuar</p>
+      <div class="field">
+        <label>Correo electrónico</label>
+        <input type="email" id="email" placeholder="usuario@ejemplo.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn" id="btn" onclick="doLogin()">Ingresar al dashboard</button>
+      <div id="msg" class="msg"></div>
+    </div>
+    <div class="footer-note">Sistema de monitoreo ambiental — Biblioteca</div>
+  </div>
+
+  <script>
+    // Redirect if already logged in
+    if (localStorage.getItem('iot_token')) window.location.href = 'index.html';
+
+    const emailEl = document.getElementById('email');
+    const passEl  = document.getElementById('password');
+    const btn     = document.getElementById('btn');
+    const msg     = document.getElementById('msg');
+
+    [emailEl, passEl].forEach(el => el.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); }));
+
+    async function doLogin() {
+      msg.className = 'msg';
+      const email    = emailEl.value.trim();
+      const password = passEl.value;
+      if (!email || !password) { showMsg('Completa todos los campos.', 'error'); return; }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Verificando...';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          showMsg(data.error || 'Error al iniciar sesión', 'error');
+          btn.disabled = false;
+          btn.innerHTML = 'Ingresar al dashboard';
+          return;
+        }
+
+        localStorage.setItem('iot_token', data.token);
+        localStorage.setItem('iot_user',  JSON.stringify(data.user));
+        showMsg('✓ Acceso concedido. Redirigiendo...', 'success');
+        setTimeout(() => window.location.href = 'index.html', 700);
+      } catch (err) {
+        showMsg('Error de conexión. Intenta de nuevo.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = 'Ingresar al dashboard';
+      }
+    }
+
+    function showMsg(text, type) {
+      msg.textContent = text;
+      msg.className = 'msg ' + type;
+    }
+  </script>
+</body>
+</html>

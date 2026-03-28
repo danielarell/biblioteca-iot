@@ -1,0 +1,12 @@
+{
+  "name": "biblioteca-iot",
+  "version": "1.0.0",
+  "private": true,
+  "engines": { "node": "20.x" },
+  "type": "module",
+  "dependencies": {
+    "@neondatabase/serverless": "^0.9.4",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
