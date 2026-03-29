@@ -8,12 +8,15 @@ export default async function handler(req, res) {
   const user = authFromRequest(req);
   if (!user) return res.status(401).json({ error: 'No autorizado' });
 
-  const { range = 'today', device = 'all', limit = '500' } = req.query;
+  const { range = 'today', device = 'all', limit = '500', since: sinceParam } = req.query;
 
-  // Calculate since timestamp
+  // Si el frontend manda el since calculado con su hora local, usarlo directamente
+  // Si no, calcular en el servidor (fallback)
   const now = new Date();
   let since;
-  if (range === 'today') {
+  if (sinceParam) {
+    since = new Date(sinceParam);
+  } else if (range === 'today') {
     since = new Date(now); since.setHours(0, 0, 0, 0);
   } else if (range === '7d') {
     since = new Date(now - 7 * 86400000);

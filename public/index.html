@@ -450,7 +450,11 @@ function setRange(r, btn) {
 }
 function getSince() {
   const now = new Date();
-  if (currentRange === 'today') { const d = new Date(now); d.setHours(0,0,0,0); return d.toISOString(); }
+  if (currentRange === 'today') {
+    // Inicio del día en hora LOCAL del usuario, no UTC
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+    return d.toISOString();
+  }
   if (currentRange === '7d')  return new Date(now - 7*86400000).toISOString();
   return new Date(now - 30*86400000).toISOString();
 }
@@ -466,7 +470,7 @@ Chart.defaults.borderColor = '#e2e6ed';
 Chart.defaults.font.family = "'DM Mono',monospace";
 Chart.defaults.font.size = 10;
 
-function baseOpts(dual) {
+function baseOpts(dual, yLabel, y1Label) {
   return {
     responsive:true, maintainAspectRatio:false, animation:false,
     interaction:{mode:'index',intersect:false},
@@ -476,8 +480,17 @@ function baseOpts(dual) {
     },
     scales:{
       x:{ticks:{maxTicksLimit:7},grid:{color:'#e2e6ed'}},
-      y:{ticks:{maxTicksLimit:5},grid:{color:'#e2e6ed'}},
-      ...(dual?{y1:{position:'right',ticks:{maxTicksLimit:5},grid:{drawOnChartArea:false}}}:{})
+      y:{
+        ticks:{maxTicksLimit:5},
+        grid:{color:'#e2e6ed'},
+        ...(yLabel ? { title:{ display:true, text:yLabel, font:{size:9,family:"'DM Mono',monospace"}, color:'#6b7280', padding:{bottom:4} } } : {})
+      },
+      ...(dual ? {y1:{
+        position:'right',
+        ticks:{maxTicksLimit:5},
+        grid:{drawOnChartArea:false},
+        ...(y1Label ? { title:{ display:true, text:y1Label, font:{size:9,family:"'DM Mono',monospace"}, color:'#6b7280', padding:{bottom:4} } } : {})
+      }} : {})
     }
   };
 }
@@ -495,12 +508,12 @@ function mkDs(label, color, data, yAxisID) {
   };
 }
 function initCharts() {
-  charts.th     = new Chart(document.getElementById('ch-th').getContext('2d'),     {type:'line',data:{labels:[],datasets:[mkDs('Temp °C','#0066ff',[],'y'),mkDs('Humedad %','#059669',[],'y1')]},options:baseOpts(true)});
-  charts.co2    = new Chart(document.getElementById('ch-co2').getContext('2d'),    {type:'line',data:{labels:[],datasets:[mkDs('CO₂','#7c3aed',[])]},options:baseOpts(false)});
-  charts.tvoc   = new Chart(document.getElementById('ch-tvoc').getContext('2d'),   {type:'line',data:{labels:[],datasets:[mkDs('TVOC','#db2777',[])]},options:baseOpts(false)});
-  charts.pres   = new Chart(document.getElementById('ch-pres').getContext('2d'),   {type:'line',data:{labels:[],datasets:[mkDs('Presión','#d97706',[])]},options:baseOpts(false)});
-  charts.lght   = new Chart(document.getElementById('ch-lght').getContext('2d'),   {type:'line',data:{labels:[],datasets:[mkDs('Luz','#0891b2',[])]},options:baseOpts(false)});
-  charts.sound  = new Chart(document.getElementById('ch-sound').getContext('2d'),  {type:'line',data:{labels:[],datasets:[mkDs('LAeq','#dc2626',[]),mkDs('LAI','#f97316',[]),mkDs('LAImax','#7c3aed',[])]},options:baseOpts(true)});
+  charts.th     = new Chart(document.getElementById('ch-th').getContext('2d'),     {type:'line',data:{labels:[],datasets:[mkDs('Temp °C','#0066ff',[],'y'),mkDs('Humedad %','#059669',[],'y1')]},options:baseOpts(true,'°C','%')});
+  charts.co2    = new Chart(document.getElementById('ch-co2').getContext('2d'),    {type:'line',data:{labels:[],datasets:[mkDs('CO₂','#7c3aed',[])]},options:baseOpts(false,'ppm')});
+  charts.tvoc   = new Chart(document.getElementById('ch-tvoc').getContext('2d'),   {type:'line',data:{labels:[],datasets:[mkDs('TVOC','#db2777',[])]},options:baseOpts(false,'índice')});
+  charts.pres   = new Chart(document.getElementById('ch-pres').getContext('2d'),   {type:'line',data:{labels:[],datasets:[mkDs('Presión','#d97706',[])]},options:baseOpts(false,'hPa')});
+  charts.lght   = new Chart(document.getElementById('ch-lght').getContext('2d'),   {type:'line',data:{labels:[],datasets:[mkDs('Luz','#0891b2',[])]},options:baseOpts(false,'lx')});
+  charts.sound  = new Chart(document.getElementById('ch-sound').getContext('2d'),  {type:'line',data:{labels:[],datasets:[mkDs('LAeq','#dc2626',[]),mkDs('LAI','#f97316',[]),mkDs('LAImax','#7c3aed',[])]},options:baseOpts(true,'dB (LAeq / LAI)','dB (LAImax)')});
 }
 
 // ── FETCH DATA ────────────────────────────────────────────
@@ -509,7 +522,8 @@ let pollingInterval = null;
 async function loadData() {
   // Verificar expiración antes de cada llamada
   const device = document.getElementById('sensor-sel').value;
-  const url    = `/api/readings?range=${currentRange}&device=${device}&limit=1000`;
+  const since  = getSince();
+  const url    = `/api/readings?range=${currentRange}&since=${encodeURIComponent(since)}&device=${device}&limit=1000`;
   try {
     const res = await fetch(url, { headers:{ Authorization:`Bearer ${TOKEN}` } });
 
