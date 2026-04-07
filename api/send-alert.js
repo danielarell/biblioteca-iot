@@ -6,7 +6,6 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  // Acepta JWT de usuario O el secret interno (para llamadas desde ttn-webhook)
   const user          = authFromRequest(req);
   const authHeader    = (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '').trim();
   const serviceSecret = process.env.INTERNAL_SECRET || process.env.TTN_WEBHOOK_SECRET || '';
@@ -28,8 +27,10 @@ export default async function handler(req, res) {
     if (channel === 'telegram' || channel === 'all') {
       tasks.push(sendTelegram(body, to));
     }
+    if (channel === 'teams' || channel === 'all') {
+      tasks.push(sendTeams(body, subject));
+    }
 
-    // Ejecutar ambos en paralelo — si uno falla el otro igual se manda
     const results = await Promise.allSettled(tasks);
     const errors  = results.filter(r => r.status === 'rejected').map(r => r.reason?.message || r.reason);
     if (errors.length > 0) console.error('Some channels failed:', errors);
@@ -58,7 +59,7 @@ async function sendEmail(to, subject, body) {
   <div class="card">
     <div class="header"><span class="ico">🚨</span><span class="title">Alerta — Biblioteca IoT</span></div>
     <div class="msg">${body}</div>
-    <div class="footer">Biblioteca IoT Monitor · ${new Date().toLocaleString('es-MX')}<br>Generado automáticamente.</div>
+    <div class="footer">Biblioteca IoT Monitor · ${new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' })}<br>Generado automáticamente.</div>
   </div></body></html>`;
 
   const r = await fetch('https://api.resend.com/emails', {
@@ -70,43 +71,22 @@ async function sendEmail(to, subject, body) {
 }
 
 // ── Telegram — múltiples destinatarios ───────────────────
-//
-// CÓMO AGREGAR UN NUEVO USUARIO A TELEGRAM:
-//   1. El usuario abre Telegram y busca tu bot (@nombre_bot)
-//   2. Le manda cualquier mensaje (ej: /start)
-//   3. Tú llamas: https://api.telegram.org/bot<TOKEN>/getUpdates
-//   4. En el JSON encuentras "chat":{"id": 123456789}
-//   5. Agrega ese número a TELEGRAM_CHAT_IDS en Vercel → redeploy
-//
-// Variables de entorno en Vercel:
-//   TELEGRAM_BOT_TOKEN = 123456:ABC-token-de-botfather
-//   TELEGRAM_CHAT_IDS  = 111111111,222222222,333333333
-//                        (separados por coma, sin espacios)
-//
-// El parámetro "to" en la request puede ser un chat_id adicional
-// específico (para notificaciones personalizadas por usuario).
-//
 async function sendTelegram(body, toChatId) {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   if (!botToken) throw new Error('TELEGRAM_BOT_TOKEN not configured');
 
-  // Lista base desde variable de entorno (todos los suscriptores)
   const envIds = (process.env.TELEGRAM_CHAT_IDS || process.env.TELEGRAM_CHAT_ID || '')
-    .split(',')
-    .map(s => s.trim())
-    .filter(Boolean);
+    .split(',').map(s => s.trim()).filter(Boolean);
 
-  // Agregar chat_id específico si vino en la request y no es el placeholder
   if (toChatId && toChatId !== 'telegram' && !envIds.includes(String(toChatId))) {
     envIds.push(String(toChatId));
   }
 
-  if (envIds.length === 0) throw new Error('No Telegram chat IDs configured. Add TELEGRAM_CHAT_IDS to Vercel env vars.');
+  if (envIds.length === 0) throw new Error('No Telegram chat IDs configured.');
 
-  const text = `⚠️ *Alerta IoT Biblioteca*\n\n${body}\n\n_${new Date().toLocaleString('es-MX')}_`;
+  const text = `⚠️ *Alerta IoT Biblioteca*\n\n${body}\n\n_${new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' })}_`;
   const url  = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
-  // Enviar a TODOS los chat_ids en paralelo
   const results = await Promise.allSettled(
     envIds.map(chatId =>
       fetch(url, {
@@ -118,10 +98,67 @@ async function sendTelegram(body, toChatId) {
   );
 
   const failed = results.filter(r => r.status === 'rejected' || !r.value?.ok);
-  if (failed.length > 0) {
-    console.warn('Some Telegram sends failed:', JSON.stringify(failed));
-  }
+  if (failed.length > 0) console.warn('Some Telegram sends failed:', JSON.stringify(failed));
 
   const anyOk = results.some(r => r.status === 'fulfilled' && r.value?.ok);
   if (!anyOk) throw new Error('All Telegram sends failed: ' + JSON.stringify(results));
+}
+
+// ── Microsoft Teams via Workflow Webhook ─────────────────
+// Variable de entorno: TEAMS_WEBHOOK_URL
+// Obtener URL: Teams → Apps → Workflows → "Send webhook alerts to a chat"
+async function sendTeams(body, subject) {
+  const url = process.env.TEAMS_WEBHOOK_URL;
+  if (!url) throw new Error('TEAMS_WEBHOOK_URL not configured');
+
+  const now = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' });
+
+  // Formato compatible con Teams Workflow webhooks
+  const payload = {
+    type: 'message',
+    attachments: [
+      {
+        contentType: 'application/vnd.microsoft.card.adaptive',
+        content: {
+          '$schema': 'http://adaptivecards.io/schemas/adaptive-card.json',
+          type: 'AdaptiveCard',
+          version: '1.2',
+          body: [
+            {
+              type: 'TextBlock',
+              text: subject || '⚠️ Alerta IoT Biblioteca',
+              weight: 'Bolder',
+              size: 'Medium',
+              color: 'Attention',
+              wrap: true,
+            },
+            {
+              type: 'TextBlock',
+              text: body.replace(/\*/g, '').replace(/_/g, ''),
+              wrap: true,
+              spacing: 'Medium',
+            },
+            {
+              type: 'TextBlock',
+              text: `🕐 ${now}`,
+              isSubtle: true,
+              size: 'Small',
+              spacing: 'Small',
+            },
+          ],
+        },
+      },
+    ],
+  };
+
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  // Teams Workflows devuelve 202 Accepted, no 200
+  if (!r.ok && r.status !== 202) {
+    throw new Error(`Teams webhook failed: ${r.status} ${await r.text()}`);
+  }
 }

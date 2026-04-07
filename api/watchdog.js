@@ -5,7 +5,7 @@
 import { sql, cors } from '../lib/db.js';
 
 const DEVICES      = ['7en1', 'sound', 'presence'];
-const GAP_MINUTES  = parseInt(process.env.WATCHDOG_GAP_MIN || '8');
+const GAP_MINUTES  = parseInt(process.env.WATCHDOG_GAP_MIN || '10');
 const CRON_SECRET  = process.env.CRON_SECRET || '';
 
 export default async function handler(req, res) {
@@ -76,7 +76,7 @@ export default async function handler(req, res) {
     const alertMsg = [
       `📡 *Sin señal — ${deviceId}*`,
       ``,
-      `Último uplink: ${lastSeen.toLocaleString('es-MX')}`,
+      `Último uplink: ${lastSeen.toLocaleString('es-MX', { timeZone: 'America/Mexico_City' })}`,
       `Tiempo sin señal: ${silentMin} minutos`,
       ``,
       `_Verifica el gateway y la alimentación del sensor._`,

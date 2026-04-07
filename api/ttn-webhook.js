@@ -87,7 +87,7 @@ export default async function handler(req, res) {
           `✅ *Señal recuperada — ${deviceId}*`,
           ``,
           `Estuvo sin señal: ${gapMin} minutos`,
-          `Recuperado: ${new Date(receivedAt).toLocaleString('es-MX')}`,
+          `Recuperado: ${new Date(receivedAt).toLocaleString('es-MX', { timeZone: 'America/Mexico_City' })}`,
         ].join('\n');
 
         fetch(`${baseUrl}/api/send-alert`, {

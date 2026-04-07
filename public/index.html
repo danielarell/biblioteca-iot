@@ -495,6 +495,7 @@ function baseOpts(dual, yLabel, y1Label) {
   };
 }
 function mkDs(label, color, data, yAxisID) {
+  // Con submuestreo los puntos son pocos — radio fijo en init, se actualiza en loadData
   return {
     label, data,
     borderColor: color,
@@ -503,7 +504,7 @@ function mkDs(label, color, data, yAxisID) {
     tension: .4,
     pointRadius: 1.5,
     borderWidth: 2,
-    spanGaps: true,        // conecta puntos sobre gaps — no inventa datos, solo dibuja línea recta
+    spanGaps: true,
     ...(yAxisID ? { yAxisID } : {})
   };
 }
@@ -519,8 +520,36 @@ function initCharts() {
 // ── FETCH DATA ────────────────────────────────────────────
 let pollingInterval = null;
 
+// Submuestreo: toma N puntos distribuidos uniformemente
+// KPIs y timestamp siempre usan los datos originales
+function downsample(arr, n) {
+  if (arr.length <= n) return arr;
+  const result = [];
+  const step = (arr.length - 1) / (n - 1);
+  for (let i = 0; i < n; i++) {
+    result.push(arr[Math.round(i * step)]);
+  }
+  result[result.length - 1] = arr[arr.length - 1];
+  return result;
+}
+
+// Puntos objetivo por rango:
+// hoy → 288 pts (1 cada 5 min), 7d → 336 pts (1 cada 30 min), 30d → 360 pts (1 cada 2h)
+function getTargetPoints() {
+  if (currentRange === '7d')  return 336;
+  if (currentRange === '30d') return 360;
+  return 288;
+}
+
+// Ajusta pointRadius según rango: puntos visibles en hoy, línea limpia en rangos largos
+function updateChartRadius() {
+  const r = currentRange === 'today' ? 1.5 : 0;
+  Object.values(charts).forEach(c => {
+    c.data.datasets.forEach(ds => { ds.pointRadius = r; });
+  });
+}
+
 async function loadData() {
-  // Verificar expiración antes de cada llamada
   const device = document.getElementById('sensor-sel').value;
   const since  = getSince();
   const url    = `/api/readings?range=${currentRange}&since=${encodeURIComponent(since)}&device=${device}&limit=1000`;
@@ -528,7 +557,6 @@ async function loadData() {
     const res = await fetch(url, { headers:{ Authorization:`Bearer ${TOKEN}` } });
 
     if (res.status === 401) {
-      // Token rechazado por el servidor → limpiar y redirigir
       logout();
       return;
     }
@@ -539,24 +567,29 @@ async function loadData() {
     const dSound = data.filter(r => r.device_id === 'sound');
     const dPres  = data.filter(r => r.device_id === 'presence');
 
-    // ── 7en1 charts ──
-    const labels7 = d7.map(r => fmtLbl(r.received_at));
+    const N = getTargetPoints();
+    updateChartRadius();
+
+    // ── 7en1 charts — submuestreados ──
+    const d7s     = downsample(d7, N);
+    const labels7 = d7s.map(r => fmtLbl(r.received_at));
     charts.th.data.labels = labels7;
-    charts.th.data.datasets[0].data = d7.map(r => r.temperature);
-    charts.th.data.datasets[1].data = d7.map(r => r.humidity);
+    charts.th.data.datasets[0].data = d7s.map(r => r.temperature);
+    charts.th.data.datasets[1].data = d7s.map(r => r.humidity);
     charts.th.update();
     [['co2','co2'],['tvoc','tvoc'],['pres','pressure'],['lght','light_level']].forEach(([key,field]) => {
       charts[key].data.labels = labels7;
-      charts[key].data.datasets[0].data = d7.map(r => r[field]);
+      charts[key].data.datasets[0].data = d7s.map(r => r[field]);
       charts[key].update();
     });
 
-    // ── Sound chart ──
-    const labelsS = dSound.map(r => fmtLbl(r.received_at));
+    // ── Sound chart — submuestreado ──
+    const dSs     = downsample(dSound, N);
+    const labelsS = dSs.map(r => fmtLbl(r.received_at));
     charts.sound.data.labels = labelsS;
-    charts.sound.data.datasets[0].data = dSound.map(r => r.laeq);
-    charts.sound.data.datasets[1].data = dSound.map(r => r.lai);
-    charts.sound.data.datasets[2].data = dSound.map(r => r.laimax);
+    charts.sound.data.datasets[0].data = dSs.map(r => r.laeq);
+    charts.sound.data.datasets[1].data = dSs.map(r => r.lai);
+    charts.sound.data.datasets[2].data = dSs.map(r => r.laimax);
     charts.sound.update();
 
     // ── KPIs 7en1 ──
@@ -608,7 +641,9 @@ async function loadData() {
     }
 
     // ── Timestamp & status ──
-    const latest = data.at(-1);
+    // Tomar el más reciente entre los últimos uplinks de cada sensor
+    const candidates = [d7.at(-1), dSound.at(-1), dPres.at(-1)].filter(Boolean);
+    const latest = candidates.sort((a,b) => new Date(b.received_at) - new Date(a.received_at))[0];
     if (latest) {
       document.getElementById('last-ts').textContent =
         new Date(latest.received_at).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',second:'2-digit'});

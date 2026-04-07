@@ -8,10 +8,8 @@ export default async function handler(req, res) {
   const user = authFromRequest(req);
   if (!user) return res.status(401).json({ error: 'No autorizado' });
 
-  const { range = 'today', device = 'all', limit = '500', since: sinceParam } = req.query;
+  const { range = 'today', device = 'all', since: sinceParam } = req.query;
 
-  // Si el frontend manda el since calculado con su hora local, usarlo directamente
-  // Si no, calcular en el servidor (fallback)
   const now = new Date();
   let since;
   if (sinceParam) {
@@ -24,40 +22,73 @@ export default async function handler(req, res) {
     since = new Date(now - 30 * 86400000);
   }
 
+  // Límite por rango — sensores enviando cada 1 min
+  // hoy: 1440/sensor, 7d: 10080/sensor, 30d: 43200/sensor
+  // Para gráficas fluidas usamos submuestreo en el frontend
+  const lim = range === '30d' ? 10000 : range === '7d' ? 3000 : 1500;
+
+  const sinceISO = since.toISOString();
+
   try {
     const db = sql();
     let rows;
 
-    if (device === 'all') {
-      rows = await db`
+    if (device !== 'all') {
+      // Un sensor específico — traer los más recientes y revertir para graficar
+      const raw = await db`
         SELECT id, device_id, received_at,
                temperature, humidity, co2, pressure,
                light_level, tvoc, pir, battery,
-               occupancy, illuminance,
-               lai, laimax, laeq
+               occupancy, illuminance, lai, laimax, laeq
         FROM sensor_readings
-        WHERE received_at >= ${since.toISOString()}
-        ORDER BY received_at ASC
-        LIMIT ${parseInt(limit)}
-      `;
-    } else {
-      rows = await db`
-        SELECT id, device_id, received_at,
-               temperature, humidity, co2, pressure,
-               light_level, tvoc, pir, battery,
-               occupancy, illuminance,
-               lai, laimax, laeq
-        FROM sensor_readings
-        WHERE received_at >= ${since.toISOString()}
+        WHERE received_at >= ${sinceISO}
           AND device_id = ${device}
-        ORDER BY received_at ASC
-        LIMIT ${parseInt(limit)}
+        ORDER BY received_at DESC
+        LIMIT ${lim}
       `;
+      rows = raw.reverse();
+    } else {
+      // Todos los sensores — query independiente por sensor para que
+      // ninguno robe espacio del otro con el límite
+      const [r7, rS, rP, last7, lastS, lastP] = await Promise.all([
+        db`SELECT id, device_id, received_at, temperature, humidity, co2, pressure, light_level, tvoc, pir, battery, occupancy, illuminance, lai, laimax, laeq
+           FROM sensor_readings WHERE received_at >= ${sinceISO} AND device_id = '7en1'
+           ORDER BY received_at DESC LIMIT ${lim}`,
+        db`SELECT id, device_id, received_at, temperature, humidity, co2, pressure, light_level, tvoc, pir, battery, occupancy, illuminance, lai, laimax, laeq
+           FROM sensor_readings WHERE received_at >= ${sinceISO} AND device_id = 'sound'
+           ORDER BY received_at DESC LIMIT ${lim}`,
+        db`SELECT id, device_id, received_at, temperature, humidity, co2, pressure, light_level, tvoc, pir, battery, occupancy, illuminance, lai, laimax, laeq
+           FROM sensor_readings WHERE received_at >= ${sinceISO} AND device_id = 'presence'
+           ORDER BY received_at DESC LIMIT ${lim}`,
+        // Último de cada sensor sin importar rango — garantiza KPIs actualizados
+        db`SELECT id, device_id, received_at, temperature, humidity, co2, pressure, light_level, tvoc, pir, battery, occupancy, illuminance, lai, laimax, laeq
+           FROM sensor_readings WHERE device_id = '7en1' ORDER BY received_at DESC LIMIT 1`,
+        db`SELECT id, device_id, received_at, temperature, humidity, co2, pressure, light_level, tvoc, pir, battery, occupancy, illuminance, lai, laimax, laeq
+           FROM sensor_readings WHERE device_id = 'sound' ORDER BY received_at DESC LIMIT 1`,
+        db`SELECT id, device_id, received_at, temperature, humidity, co2, pressure, light_level, tvoc, pir, battery, occupancy, illuminance, lai, laimax, laeq
+           FROM sensor_readings WHERE device_id = 'presence' ORDER BY received_at DESC LIMIT 1`,
+      ]);
+
+      // Revertir cada array a orden cronológico y combinar
+      const historico = [
+        ...r7.reverse(),
+        ...rS.reverse(),
+        ...rP.reverse(),
+      ].sort((a, b) => new Date(a.received_at) - new Date(b.received_at));
+
+      // Asegurar que el último de cada sensor esté incluido
+      // aunque esté fuera del rango de fecha seleccionado
+      const ids = new Set(historico.map(r => r.id));
+      for (const latest of [...last7, ...lastS, ...lastP]) {
+        if (!ids.has(latest.id)) historico.push(latest);
+      }
+
+      rows = historico;
     }
 
     return res.status(200).json({ data: rows });
   } catch (err) {
     console.error('Readings error:', err);
-    return res.status(500).json({ error: 'Error consultando datos' });
+    return res.status(500).json({ error: String(err) });
   }
 }
