@@ -67,7 +67,7 @@
     .section-hdr { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-family: 'DM Mono', monospace; margin: 1.25rem 0 .75rem; padding-bottom: .4rem; border-bottom: 1px solid var(--border); }
 
     /* KPI GRID */
-    .kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: .875rem; margin-bottom: .25rem; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: .875rem; margin-bottom: .25rem; }
     .kpi-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: .875rem; margin-bottom: .25rem; }
     .kpi-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: .875rem; margin-bottom: .25rem; }
     .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.1rem; position: relative; overflow: hidden; transition: transform .2s, border-color .2s, box-shadow .2s; cursor: default; }
@@ -120,8 +120,26 @@
     .a-badge.high{background:#fee2e2;color:#991b1b}.a-badge.med{background:#fef3c7;color:#92400e}
     .no-data { text-align: center; padding: 2.5rem; color: var(--muted); font-family: 'DM Mono', monospace; font-size: .82rem; }
 
-    /* SETTINGS */
-    .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px,1fr)); gap: 1.25rem; }
+    /* GUIDE PAGE */
+    .guide-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(340px,1fr)); gap: 1rem; }
+    .guide-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; display: flex; gap: 1rem; align-items: flex-start; transition: box-shadow .2s; }
+    .guide-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.07); }
+    .guide-ico { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+    .guide-body { flex: 1; }
+    .guide-title { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: .4rem; }
+    .guide-desc { font-size: .78rem; color: var(--muted); line-height: 1.65; margin-bottom: .5rem; }
+    .guide-tag { font-size: .6rem; font-family: 'DM Mono',monospace; color: var(--accent); background: #eff6ff; border-radius: 9999px; display: inline-block; padding: 2px 8px; }
+    /* LIMITS PAGE */
+    .lim-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: .875rem; }
+    .lim-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.1rem; }
+    .lim-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: .75rem; }
+    .lim-ico { font-size: 18px; }
+    .lim-name { font-size: .82rem; font-weight: 700; color: var(--text); }
+    .lim-unit { font-size: .6rem; color: var(--muted); font-family: 'DM Mono',monospace; margin-left: 2px; }
+    .lim-bar-wrap { background: var(--surface2); border-radius: 6px; height: 6px; margin-bottom: .5rem; position: relative; overflow: visible; }
+    .lim-bar { height: 6px; border-radius: 6px; background: linear-gradient(90deg,var(--accent2),var(--accent)); }
+    .lim-values { display: flex; justify-content: space-between; font-size: .65rem; font-family: 'DM Mono',monospace; color: var(--muted); }
+    .lim-badge { font-size: .58rem; font-family: 'DM Mono',monospace; background: #d1fae5; color: #065f46; border-radius: 9999px; padding: 1px 7px; margin-left: auto; }
     .sc { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.4rem; }
     .sc h3 { font-size: .9rem; font-weight: 700; margin-bottom: 1.1rem; color: var(--text); }
     .th-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: .65rem; padding: .65rem 0; border-bottom: 1px solid var(--border); }
@@ -165,16 +183,23 @@
     .t-body  { font-size: .72rem; color: var(--muted); font-family: 'DM Mono', monospace; }
     .t-x { margin-left: auto; background: none; border: none; color: var(--muted2); cursor: pointer; font-size: 13px; flex-shrink: 0; }
 
-    @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(3,1fr); } }
+    .lux-table { width:100%; border-collapse:collapse; margin-top:.75rem; font-size:.68rem; font-family:'DM Mono',monospace; }
+    .lux-table th { background:var(--surface2); color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-size:.58rem; padding:.35rem .5rem; text-align:left; border-bottom:2px solid var(--border); }
+    .lux-table td { padding:.3rem .5rem; border-bottom:1px solid var(--border); color:var(--text); }
+    .lux-table tr:last-child td { border-bottom:none; }
+    .lux-table tr.lux-ideal td { background:#ecfdf5; color:#065f46; font-weight:600; }
+    .lux-table td.lux-ok { color:var(--accent); }
+    @media (max-width: 1200px) { .kpi-grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(4, 1fr); } }
     @media (max-width: 900px) {
-      .kpi-grid,.kpi-grid-4 { grid-template-columns: repeat(2,1fr); }
-      .kpi-grid-3 { grid-template-columns: repeat(2,1fr); }
+      .kpi-grid,.kpi-grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .kpi-grid-3 { grid-template-columns: repeat(2, 1fr); }
       .charts-grid { grid-template-columns: 1fr; }
       .cc.wide { grid-column: 1; }
     }
     @media (max-width: 600px) {
       .sidebar { display: none; } .main { margin-left: 0; }
-      .kpi-grid,.kpi-grid-3,.kpi-grid-4 { grid-template-columns: repeat(2,1fr); }
+      .kpi-grid,.kpi-grid-3,.kpi-grid-4 { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -191,8 +216,9 @@
     <div class="nav-item" onclick="showPage('alerts',this)"><span class="nav-icon">⚡</span> Alertas<span class="nav-badge" id="alert-badge">0</span></div>
   </nav>
   <nav class="nav-sec">
-    <div class="nav-lbl">Configuración</div>
-    <div class="nav-item" onclick="showPage('settings',this)"><span class="nav-icon">⚙</span> Límites y alertas</div>
+    <div class="nav-lbl">Información</div>
+    <div class="nav-item" onclick="showPage('limits',this)"><span class="nav-icon">🎚</span> Límites activos</div>
+    <div class="nav-item" onclick="showPage('guide',this)"><span class="nav-icon">📖</span> Guía de variables</div>
   </nav>
   <div class="sb-bottom">
     <div class="user-pill">
@@ -239,6 +265,7 @@
         <div class="kpi cg"  id="k-temp"><div class="kpi-top"><span class="kpi-ico">🌡</span><span class="kpi-st ok" id="st-temp">OK</span></div><div class="kpi-val" id="v-temp">—</div><div class="kpi-lbl">Temperatura</div><div class="kpi-tr" id="tr-temp">&nbsp;</div></div>
         <div class="kpi cb"  id="k-hum"> <div class="kpi-top"><span class="kpi-ico">💧</span><span class="kpi-st ok" id="st-hum">OK</span></div><div class="kpi-val" id="v-hum">—</div><div class="kpi-lbl">Humedad</div><div class="kpi-tr" id="tr-hum">&nbsp;</div></div>
         <div class="kpi cp"  id="k-co2"> <div class="kpi-top"><span class="kpi-ico">🫧</span><span class="kpi-st ok" id="st-co2">OK</span></div><div class="kpi-val" id="v-co2">—</div><div class="kpi-lbl">CO₂ (ppm)</div><div class="kpi-tr" id="tr-co2">&nbsp;</div></div>
+        <div class="kpi cp"  id="k-tvoc"><div class="kpi-top"><span class="kpi-ico">🌫</span><span class="kpi-st ok" id="st-tvoc">OK</span></div><div class="kpi-val" id="v-tvoc">—</div><div class="kpi-lbl">TVOC (µg/m³)</div><div class="kpi-tr" id="tr-tvoc">&nbsp;</div></div>
         <div class="kpi co"  id="k-pres"><div class="kpi-top"><span class="kpi-ico">🔵</span><span class="kpi-st ok" id="st-pres">OK</span></div><div class="kpi-val" id="v-pres">—</div><div class="kpi-lbl">Presión (hPa)</div><div class="kpi-tr" id="tr-pres">&nbsp;</div></div>
         <div class="kpi cpk" id="k-lght"><div class="kpi-top"><span class="kpi-ico">☀</span><span class="kpi-st ok" id="st-lght">OK</span></div><div class="kpi-val" id="v-lght">—</div><div class="kpi-lbl">Nivel de luz</div><div class="kpi-tr" id="tr-lght">&nbsp;</div></div>
         <div class="kpi cw"  id="k-bat7"><div class="kpi-top"><span class="kpi-ico">🔋</span><span class="kpi-st ok" id="st-bat7">OK</span></div><div class="kpi-val" id="v-bat7">—</div><div class="kpi-lbl">Batería 7en1</div><div class="kpi-tr" id="tr-bat7">&nbsp;</div></div>
@@ -266,9 +293,23 @@
       <div class="charts-grid">
         <div class="cc wide" data-sensor="7en1"><div class="ch"><span class="ct">Temperatura &amp; Humedad</span><span class="cm">sensor: 7en1</span></div><div class="cw"><canvas id="ch-th"></canvas></div></div>
         <div class="cc" data-sensor="7en1"><div class="ch"><span class="ct">CO₂</span><span class="cm">ppm · 7en1</span></div><div class="cw"><canvas id="ch-co2"></canvas></div></div>
-        <div class="cc" data-sensor="7en1"><div class="ch"><span class="ct">TVOC</span><span class="cm">índice · 7en1</span></div><div class="cw"><canvas id="ch-tvoc"></canvas></div></div>
+        <div class="cc" data-sensor="7en1"><div class="ch"><span class="ct">TVOC</span><span class="cm">µg/m³ · 7en1</span></div><div class="cw"><canvas id="ch-tvoc"></canvas></div></div>
         <div class="cc" data-sensor="7en1"><div class="ch"><span class="ct">Presión atmosférica</span><span class="cm">hPa · 7en1</span></div><div class="cw"><canvas id="ch-pres"></canvas></div></div>
-        <div class="cc" data-sensor="7en1"><div class="ch"><span class="ct">Nivel de luz</span><span class="cm">lx · 7en1</span></div><div class="cw"><canvas id="ch-lght"></canvas></div></div>
+        <div class="cc" data-sensor="7en1">
+  <div class="ch"><span class="ct">Nivel de luz</span><span class="cm">nivel · 7en1</span></div>
+  <div class="cw"><canvas id="ch-lght"></canvas></div>
+  <table class="lux-table">
+    <thead><tr><th>Nivel</th><th>Lux</th><th>Ambiente</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>0–5</td><td>Sin luz / luz de calle nocturna</td></tr>
+      <tr><td>1</td><td>6–50</td><td>Interior nublado</td></tr>
+      <tr><td class="lux-ok">2</td><td class="lux-ok">51–100</td><td class="lux-ok">Sala de estar / pasillos</td></tr>
+      <tr class="lux-ideal"><td>3</td><td>101–500</td><td>✓ Oficinas, estudio, bibliotecas</td></tr>
+      <tr><td>4</td><td>501–2000</td><td>Supermercados, talleres</td></tr>
+      <tr><td>5</td><td>&gt;2000</td><td>Tareas visuales de alta precisión</td></tr>
+    </tbody>
+  </table>
+</div>
         <div class="cc wide" data-sensor="sound"><div class="ch"><span class="ct">Ruido — LAeq / LAI / LAImax</span><span class="cm">dB · sound</span></div><div class="cw"><canvas id="ch-sound"></canvas></div></div>
       </div>
     </div>
@@ -285,44 +326,123 @@
       </div>
     </div>
 
-    <!-- ── SETTINGS ── -->
-    <div class="page" id="page-settings">
-      <div class="page-header"><div><h2>Configuración de límites</h2><p>Define umbrales y canales de notificación</p></div></div>
-      <div class="settings-grid">
+    <!-- ── LIMITS ── -->
+    <div class="page" id="page-limits">
+      <div class="page-header"><div><h2>Límites activos</h2><p>Umbrales configurados para las alertas del sistema</p></div></div>
+      <div class="lim-grid" id="limits-grid"></div>
+    </div>
 
-        <div class="sc">
-          <h3>⚠️ Umbrales de alerta</h3>
-          <div class="th-row"><div><div class="th-name">Temperatura</div><div class="th-unit">°C</div></div><div class="th-inputs"><div class="th-iw"><input type="number" class="ti" id="th-temp-min" value="16" step="0.5"><span class="th-sub">mín</span></div><div class="th-iw"><input type="number" class="ti" id="th-temp-max" value="30" step="0.5"><span class="th-sub">máx</span></div></div></div>
-          <div class="th-row"><div><div class="th-name">Humedad</div><div class="th-unit">%</div></div><div class="th-inputs"><div class="th-iw"><input type="number" class="ti" id="th-hum-min" value="30"><span class="th-sub">mín</span></div><div class="th-iw"><input type="number" class="ti" id="th-hum-max" value="70"><span class="th-sub">máx</span></div></div></div>
-          <div class="th-row"><div><div class="th-name">CO₂</div><div class="th-unit">ppm</div></div><div class="th-inputs"><div class="th-iw"><input type="number" class="ti" id="th-co2-min" value="400"><span class="th-sub">mín</span></div><div class="th-iw"><input type="number" class="ti" id="th-co2-max" value="1000"><span class="th-sub">máx</span></div></div></div>
-          <div class="th-row"><div><div class="th-name">Presión</div><div class="th-unit">hPa</div></div><div class="th-inputs"><div class="th-iw"><input type="number" class="ti" id="th-pres-min" value="800"><span class="th-sub">mín</span></div><div class="th-iw"><input type="number" class="ti" id="th-pres-max" value="1050"><span class="th-sub">máx</span></div></div></div>
-          <div class="th-row"><div><div class="th-name">LAeq (ruido equiv.)</div><div class="th-unit">dB</div></div><div class="th-inputs"><div class="th-iw"><input type="number" class="ti" id="th-laeq-min" value="0"><span class="th-sub">mín</span></div><div class="th-iw"><input type="number" class="ti" id="th-laeq-max" value="70"><span class="th-sub">máx</span></div></div></div>
-          <div class="th-row"><div><div class="th-name">LAImax (pico)</div><div class="th-unit">dB</div></div><div class="th-inputs"><div class="th-iw"><input type="number" class="ti" id="th-laimax-min" value="0"><span class="th-sub">mín</span></div><div class="th-iw"><input type="number" class="ti" id="th-laimax-max" value="85"><span class="th-sub">máx</span></div></div></div>
-          <div class="th-row"><div><div class="th-name">Batería</div><div class="th-unit">%</div></div><div class="th-inputs"><div class="th-iw"><input type="number" class="ti" id="th-bat-min" value="20"><span class="th-sub">mín</span></div><div class="th-iw"><input type="number" class="ti" id="th-bat-max" value="100"><span class="th-sub">máx</span></div></div></div>
-          <div class="save-row"><button class="btn-primary" onclick="saveThresholds()">Guardar umbrales</button><span class="save-msg" id="sm-th">✓ Guardado</span></div>
+    <!-- ── GUIDE ── -->
+    <div class="page" id="page-guide">
+      <div class="page-header"><div><h2>Guía de variables</h2><p>Qué mide cada sensor y por qué importa</p></div></div>
+      <div class="guide-grid">
+
+        <div class="guide-card">
+          <div class="guide-ico">🌡</div>
+          <div class="guide-body">
+            <div class="guide-title">Temperatura (°C)</div>
+            <div class="guide-desc">Mide el calor del ambiente. Una biblioteca debe mantenerse entre 16 °C y 30 °C para el confort de los usuarios y la conservación del material bibliográfico. Temperaturas extremas deterioran libros y causan malestar.</div>
+            <div class="guide-tag">Sensor: 7en1</div>
+          </div>
         </div>
 
-        <div class="sc">
-          <h3>📬 Canales de notificación</h3>
-
-          <div class="notif-row"><div><div class="notif-lbl">Correo electrónico</div><div class="notif-sub">Alerta vía email (Resend)</div></div><label class="toggle"><input type="checkbox" id="n-email" checked><span class="tslider"></span></label></div>
-          <div style="padding:.4rem 0 .8rem"><input type="email" class="si" id="email-dest" placeholder="destino@email.com"></div>
-
-          <div class="notif-row"><div><div class="notif-lbl">Telegram</div><div class="notif-sub">Mensaje instantáneo (gratis)</div></div><label class="toggle"><input type="checkbox" id="n-telegram" checked><span class="tslider"></span></label></div>
-          <div style="padding:.4rem 0 .4rem">
-            <input type="text" class="si" id="telegram-chatid" placeholder="Chat ID adicional (opcional)">
+        <div class="guide-card">
+          <div class="guide-ico">💧</div>
+          <div class="guide-body">
+            <div class="guide-title">Humedad relativa (%)</div>
+            <div class="guide-desc">Indica la cantidad de vapor de agua en el aire. El rango ideal es 30–70 %. Por debajo el papel se vuelve frágil y hay electricidad estática; por encima se favorece el moho en libros y daños en equipos electrónicos.</div>
+            <div class="guide-tag">Sensor: 7en1</div>
           </div>
-          <div class="info-box">
-            💡 <strong>Agregar nuevo usuario a Telegram:</strong><br>
-            1. El usuario manda <code>/start</code> a tu bot<br>
-            2. Llama: <code>api.telegram.org/bot&lt;TOKEN&gt;/getUpdates</code><br>
-            3. Copia el <code>chat.id</code> del JSON<br>
-            4. Agrégalo a <code>TELEGRAM_CHAT_IDS</code> en Vercel y redeploy
-          </div>
+        </div>
 
-          <div class="notif-row" style="margin-top:.75rem"><div><div class="notif-lbl">Notificación en dashboard</div><div class="notif-sub">Toast en pantalla — siempre activo</div></div><span style="font-size:.65rem;color:var(--accent);font-family:'DM Mono',monospace">activo</span></div>
-          <div class="notif-row"><div><div class="notif-lbl">Cooldown entre alertas</div><div class="notif-sub">Minutos sin repetir el mismo tipo</div></div><input type="number" class="ti" id="n-cooldown" value="15" min="1" max="1440" style="width:60px"></div>
-          <div class="save-row"><button class="btn-primary" onclick="saveNotif()">Guardar configuración</button><span class="save-msg" id="sm-notif">✓ Guardado</span></div>
+        <div class="guide-card">
+          <div class="guide-ico">🫧</div>
+          <div class="guide-body">
+            <div class="guide-title">CO₂ — Dióxido de carbono (ppm)</div>
+            <div class="guide-desc">El CO₂ aumenta con la ocupación humana. Niveles superiores a 1000 ppm indican ventilación insuficiente y se asocian con somnolencia, dificultad de concentración y bajo rendimiento cognitivo — crítico en un espacio de estudio. El aire exterior ronda 400 ppm.</div>
+            <div class="guide-tag">Sensor: 7en1</div>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-ico">🌫</div>
+          <div class="guide-body">
+            <div class="guide-title">TVOC — Compuestos orgánicos volátiles (µg/m³)</div>
+            <div class="guide-desc">Los TVOC son gases emitidos por pinturas, adhesivos, limpiadores y materiales de construcción. A concentraciones superiores a 1000 µg/m³ pueden causar irritación en ojos y vías respiratorias, dolores de cabeza y fatiga. Una buena ventilación los mantiene bajos.</div>
+            <div class="guide-tag">Sensor: 7en1</div>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-ico">🔵</div>
+          <div class="guide-body">
+            <div class="guide-title">Presión atmosférica (hPa)</div>
+            <div class="guide-desc">La presión barométrica varía con la altitud y el clima. En Guadalajara (1560 m.s.n.m.) el valor normal es ≈ 840 hPa. Cambios bruscos pueden indicar tormentas o anomalías. También sirve para validar que el sensor funciona correctamente.</div>
+            <div class="guide-tag">Sensor: 7en1</div>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-ico">☀</div>
+          <div class="guide-body">
+            <div class="guide-title">Nivel de luz (lux)</div>
+            <div class="guide-desc">Mide la iluminancia del ambiente. Para lectura y trabajo de escritorio se recomiendan 300–500 lux (Nivel 3). Menos luz genera fatiga visual; demasiada causa reflejos en pantallas. La gráfica convierte el nivel del sensor a su valor medio en lux.</div>
+            <div class="guide-tag">Sensor: 7en1</div>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-ico">📊</div>
+          <div class="guide-body">
+            <div class="guide-title">LAeq — Nivel equivalente de ruido (dB)</div>
+            <div class="guide-desc">Es el promedio energético del ruido durante el período de medición. Representa la "dosis" de ruido acumulada. La OMS recomienda &lt; 35 dB en aulas y &lt; 70 dB en ambientes generales. Superar 70 dB sostenido afecta la concentración y puede dañar la audición a largo plazo.</div>
+            <div class="guide-tag">Sensor: Sound</div>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-ico">🔉</div>
+          <div class="guide-body">
+            <div class="guide-title">LAI — Nivel instantáneo de ruido (dB)</div>
+            <div class="guide-desc">Medición instantánea del nivel sonoro en ese preciso momento. A diferencia del LAeq que promedia, el LAI captura fluctuaciones rápidas. Es útil para detectar eventos cortos pero intensos (voces, golpes) que el promedio podría suavizar.</div>
+            <div class="guide-tag">Sensor: Sound</div>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-ico">📢</div>
+          <div class="guide-body">
+            <div class="guide-title">LAImax — Pico máximo de ruido (dB)</div>
+            <div class="guide-desc">El valor más alto de LAI registrado en el período. Captura eventos de ruido impulsivo extremo (portazos, alarmas, gritos). Superar 85 dB en picos puede dañar la audición con exposiciones repetidas y es señal de perturbaciones graves en el ambiente.</div>
+            <div class="guide-tag">Sensor: Sound</div>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-ico">🚶</div>
+          <div class="guide-body">
+            <div class="guide-title">Ocupación</div>
+            <div class="guide-desc">Detecta si hay presencia humana en el área monitoreada usando un sensor PIR (infrarrojo pasivo). Reporta "Ocupado" cuando detecta movimiento o calor corporal y "Libre" cuando no hay actividad. Útil para correlacionar con niveles de CO₂ y ruido.</div>
+            <div class="guide-tag">Sensor: Presence</div>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-ico">💡</div>
+          <div class="guide-body">
+            <div class="guide-title">Iluminancia (dim / bright)</div>
+            <div class="guide-desc">El sensor de presencia también detecta el nivel de luz ambiental de forma cualitativa. "Dim" indica poca luz y "Bright" indica buena iluminación. Complementa la medición de lux del sensor 7en1 para verificar condiciones de iluminación en diferentes zonas.</div>
+            <div class="guide-tag">Sensor: Presence</div>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-ico">🔋</div>
+          <div class="guide-body">
+            <div class="guide-title">Batería (%)</div>
+            <div class="guide-desc">Nivel de carga de la batería de cada sensor LoRaWAN. Una alerta se dispara cuando baja del 20 %. Sensores con batería baja pueden dejar de transmitir datos sin previo aviso, creando huecos en el monitoreo. Se recomienda revisar y recargar antes de llegar al 20 %.</div>
+            <div class="guide-tag">Sensores: 7en1 · Sound · Presence</div>
+          </div>
         </div>
 
       </div>
@@ -349,64 +469,29 @@ const charts     = {};
 
 let thresholds = {
   temperature:{min:16,max:30}, humidity:{min:30,max:70},
-  co2:{min:400,max:1000},      pressure:{min:800,max:1050},
+  co2:{min:400,max:1000},      tvoc:{min:0,max:1000},
+  pressure:{min:800,max:1050},
   laeq:{min:0,max:70},         laimax:{min:0,max:85},
   battery:{min:20,max:100}
 };
 let notifCfg = { email:true, emailDest:'', telegram:true, telegramChatId:'', cooldown:15 };
 
 // ── SETTINGS LOAD ─────────────────────────────────────────
+// Solo carga los valores en memoria — los inputs del settings
+// fueron eliminados junto con el tab de configuración editable
 (function loadSettings() {
   const t = localStorage.getItem('iot_thresholds');
   if (t) thresholds = { ...thresholds, ...JSON.parse(t) };
   const n = localStorage.getItem('iot_notif');
   if (n) notifCfg = { ...notifCfg, ...JSON.parse(n) };
-
-  const map = {
-    temperature:'temp', humidity:'hum', co2:'co2',
-    pressure:'pres', laeq:'laeq', laimax:'laimax', battery:'bat'
-  };
-  Object.entries(map).forEach(([key, id]) => {
-    const mn = document.getElementById(`th-${id}-min`);
-    const mx = document.getElementById(`th-${id}-max`);
-    if (mn) mn.value = thresholds[key]?.min ?? '';
-    if (mx) mx.value = thresholds[key]?.max ?? '';
-  });
-  document.getElementById('n-email').checked        = notifCfg.email;
-  document.getElementById('n-telegram').checked     = notifCfg.telegram;
-  document.getElementById('email-dest').value       = notifCfg.emailDest    || '';
-  document.getElementById('telegram-chatid').value  = notifCfg.telegramChatId || '';
-  document.getElementById('n-cooldown').value       = notifCfg.cooldown || 15;
 })();
 
-function saveThresholds() {
-  thresholds = {
-    temperature:{ min:+document.getElementById('th-temp-min').value,   max:+document.getElementById('th-temp-max').value   },
-    humidity:   { min:+document.getElementById('th-hum-min').value,    max:+document.getElementById('th-hum-max').value    },
-    co2:        { min:+document.getElementById('th-co2-min').value,    max:+document.getElementById('th-co2-max').value    },
-    pressure:   { min:+document.getElementById('th-pres-min').value,   max:+document.getElementById('th-pres-max').value   },
-    laeq:       { min:+document.getElementById('th-laeq-min').value,   max:+document.getElementById('th-laeq-max').value   },
-    laimax:     { min:+document.getElementById('th-laimax-min').value, max:+document.getElementById('th-laimax-max').value },
-    battery:    { min:+document.getElementById('th-bat-min').value,    max:+document.getElementById('th-bat-max').value    },
-  };
-  localStorage.setItem('iot_thresholds', JSON.stringify(thresholds));
-  flash('sm-th');
-}
-function saveNotif() {
-  notifCfg = {
-    email:          document.getElementById('n-email').checked,
-    emailDest:      document.getElementById('email-dest').value.trim(),
-    telegram:       document.getElementById('n-telegram').checked,
-    telegramChatId: document.getElementById('telegram-chatid').value.trim(),
-    cooldown:       +document.getElementById('n-cooldown').value,
-  };
-  localStorage.setItem('iot_notif', JSON.stringify(notifCfg));
-  flash('sm-notif');
-}
+function saveThresholds() {}  // no-op: settings editables eliminados
+
+function saveNotif() {}  // no-op: settings editables eliminados
 function flash(id) {
   const el = document.getElementById(id);
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2400);
+  if (el) { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2400); }
 }
 
 // ── SENSOR FILTER — mostrar/ocultar secciones ─────────────
@@ -436,9 +521,43 @@ function showPage(page, navEl) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(`page-${page}`).classList.add('active');
   navEl.classList.add('active');
-  document.getElementById('page-title').textContent = {dashboard:'Dashboard',alerts:'Alertas',settings:'Configuración'}[page];
+  document.getElementById('page-title').textContent = {dashboard:'Dashboard',alerts:'Alertas',limits:'Límites activos',guide:'Guía de variables'}[page];
   document.getElementById('fbar').style.display = page === 'dashboard' ? 'flex' : 'none';
   if (page === 'alerts') renderAlerts();
+  if (page === 'limits') renderLimits();
+}
+
+// ── LIMITS PAGE ───────────────────────────────────────────
+function renderLimits() {
+  const defs = [
+    { key:'temperature', ico:'🌡', name:'Temperatura',     unit:'°C',    sensor:'7en1' },
+    { key:'humidity',    ico:'💧', name:'Humedad',          unit:'%',     sensor:'7en1' },
+    { key:'co2',         ico:'🫧', name:'CO₂',             unit:'ppm',   sensor:'7en1' },
+    { key:'tvoc',        ico:'🌫', name:'TVOC',            unit:'µg/m³', sensor:'7en1' },
+    { key:'pressure',    ico:'🔵', name:'Presión',          unit:'hPa',   sensor:'7en1' },
+    { key:'laeq',        ico:'📊', name:'LAeq (ruido)',     unit:'dB',    sensor:'Sound' },
+    { key:'laimax',      ico:'📢', name:'LAImax (pico)',    unit:'dB',    sensor:'Sound' },
+    { key:'battery',     ico:'🔋', name:'Batería',          unit:'%',     sensor:'Todos' },
+  ];
+  const grid = document.getElementById('limits-grid');
+  grid.innerHTML = defs.map(d => {
+    const th  = thresholds[d.key] || { min: 0, max: 100 };
+    const hasMin = th.min > 0;
+    return `
+    <div class="lim-card">
+      <div class="lim-card-top">
+        <span class="lim-ico">${d.ico}</span>
+        <span class="lim-name">${d.name}</span>
+        <span class="lim-unit">${d.unit}</span>
+        <span class="lim-badge">${d.sensor}</span>
+      </div>
+      <div class="lim-bar-wrap"><div class="lim-bar" style="width:100%"></div></div>
+      <div class="lim-values">
+        <span>${hasMin ? '⬇ mín: '+th.min+' '+d.unit : '—'}</span>
+        <span>⬆ máx: ${th.max} ${d.unit}</span>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ── DATE RANGE ────────────────────────────────────────────
@@ -511,9 +630,9 @@ function mkDs(label, color, data, yAxisID) {
 function initCharts() {
   charts.th     = new Chart(document.getElementById('ch-th').getContext('2d'),     {type:'line',data:{labels:[],datasets:[mkDs('Temp °C','#0066ff',[],'y'),mkDs('Humedad %','#059669',[],'y1')]},options:baseOpts(true,'°C','%')});
   charts.co2    = new Chart(document.getElementById('ch-co2').getContext('2d'),    {type:'line',data:{labels:[],datasets:[mkDs('CO₂','#7c3aed',[])]},options:baseOpts(false,'ppm')});
-  charts.tvoc   = new Chart(document.getElementById('ch-tvoc').getContext('2d'),   {type:'line',data:{labels:[],datasets:[mkDs('TVOC','#db2777',[])]},options:baseOpts(false,'índice')});
+  charts.tvoc   = new Chart(document.getElementById('ch-tvoc').getContext('2d'),   {type:'line',data:{labels:[],datasets:[mkDs('TVOC','#db2777',[])]},options:baseOpts(false,'µg/m³')});
   charts.pres   = new Chart(document.getElementById('ch-pres').getContext('2d'),   {type:'line',data:{labels:[],datasets:[mkDs('Presión','#d97706',[])]},options:baseOpts(false,'hPa')});
-  charts.lght   = new Chart(document.getElementById('ch-lght').getContext('2d'),   {type:'line',data:{labels:[],datasets:[mkDs('Luz','#0891b2',[])]},options:baseOpts(false,'lx')});
+  charts.lght = new Chart(document.getElementById('ch-lght').getContext('2d'), {type:'line',data:{labels:[],datasets:[mkDs('Nivel','#0891b2',[])]},options:baseOpts(false,'nivel')});
   charts.sound  = new Chart(document.getElementById('ch-sound').getContext('2d'),  {type:'line',data:{labels:[],datasets:[mkDs('LAeq','#dc2626',[]),mkDs('LAI','#f97316',[]),mkDs('LAImax','#7c3aed',[])]},options:baseOpts(true,'dB (LAeq / LAI)','dB (LAImax)')});
 }
 
@@ -531,6 +650,14 @@ function downsample(arr, n) {
   }
   result[result.length - 1] = arr[arr.length - 1];
   return result;
+}
+
+// Mapa de nivel de luz → lux medio según datasheet del sensor 7en1
+// Level 0: 0-5 lux → 2, Level 1: 6-50 → 28, Level 2: 51-100 → 75
+// Level 3: 101-500 → 300, Level 4: 501-2000 → 1250, Level 5: >2000 → 3000
+function luxFromLevel(level) {
+  const map = { 0: 2, 1: 28, 2: 75, 3: 300, 4: 1250, 5: 3000 };
+  return map[level] ?? null;
 }
 
 // Puntos objetivo por rango:
@@ -577,11 +704,15 @@ async function loadData() {
     charts.th.data.datasets[0].data = d7s.map(r => r.temperature);
     charts.th.data.datasets[1].data = d7s.map(r => r.humidity);
     charts.th.update();
-    [['co2','co2'],['tvoc','tvoc'],['pres','pressure'],['lght','light_level']].forEach(([key,field]) => {
+    [['co2','co2'],['tvoc','tvoc'],['pres','pressure']].forEach(([key,field]) => {
       charts[key].data.labels = labels7;
       charts[key].data.datasets[0].data = d7s.map(r => r[field]);
       charts[key].update();
     });
+    // ── Luz — nivel directo (0-5), tabla de referencia abajo de la gráfica ──
+    charts.lght.data.labels = labels7;
+    charts.lght.data.datasets[0].data = d7s.map(r => r.light_level);
+    charts.lght.update();
 
     // ── Sound chart — submuestreado ──
     const dSs     = downsample(dSound, N);
@@ -599,7 +730,8 @@ async function loadData() {
       setKPI('hum',  last7.humidity,    prev7?.humidity,    '%',   'humidity');
       setKPI('co2',  last7.co2,         prev7?.co2,         'ppm', 'co2');
       setKPI('pres', last7.pressure,    prev7?.pressure,    'hPa', 'pressure');
-      setKPI('lght', last7.light_level, prev7?.light_level, 'lx',  null);
+      setKPI('tvoc', last7.tvoc,         prev7?.tvoc,         ' µg/m³','tvoc');
+      setKPI('lght', last7.light_level, prev7?.light_level, '', null);
     }
     const bats7 = d7.filter(r => r.battery !== null);
     const lastB7 = bats7.at(-1), prevB7 = bats7.at(-2);
@@ -699,6 +831,7 @@ const alertFields = [
   {key:'temperature',label:'Temperatura',unit:'°C',  thKey:'temperature'},
   {key:'humidity',   label:'Humedad',     unit:'%',   thKey:'humidity'},
   {key:'co2',        label:'CO₂',         unit:'ppm', thKey:'co2'},
+  {key:'tvoc',       label:'TVOC',         unit:'µg/m³',thKey:'tvoc'},
   {key:'pressure',   label:'Presión',     unit:'hPa', thKey:'pressure'},
   {key:'laeq',       label:'Ruido LAeq',  unit:'dB',  thKey:'laeq'},
   {key:'laimax',     label:'Ruido pico',  unit:'dB',  thKey:'laimax'},

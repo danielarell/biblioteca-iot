@@ -125,6 +125,7 @@ export default async function handler(req, res) {
       temperature: { min: parseFloat(process.env.TH_TEMP_MIN   || '16'),  max: parseFloat(process.env.TH_TEMP_MAX   || '30')   },
       humidity:    { min: parseFloat(process.env.TH_HUM_MIN    || '30'),  max: parseFloat(process.env.TH_HUM_MAX    || '70')   },
       co2:         { min: 0,                                               max: parseFloat(process.env.TH_CO2_MAX    || '1000') },
+      tvoc:        { min: 0,                                               max: parseFloat(process.env.TH_TVOC_MAX   || '1000') },
       pressure:    { min: parseFloat(process.env.TH_PRES_MIN   || '800'), max: parseFloat(process.env.TH_PRES_MAX   || '1050') },
       laeq:        { min: 0,                                               max: parseFloat(process.env.TH_LAEQ_MAX   || '70')  },
       laimax:      { min: 0,                                               max: parseFloat(process.env.TH_LAIMAX_MAX || '85')  },
@@ -133,7 +134,7 @@ export default async function handler(req, res) {
 
     // ── Qué valores checar para este dispositivo ──────────
     const checks = {
-      '7en1':     [['temperature',temperature],['humidity',humidity],['co2',co2],['pressure',pressure],['battery',battery]],
+      '7en1':     [['temperature',temperature],['humidity',humidity],['co2',co2],['tvoc',tvoc],['pressure',pressure],['battery',battery]],
       'sound':    [['laeq',laeq],['laimax',laimax],['battery',battery]],
       'presence': [['battery',battery]],
     }[deviceId] || [];
@@ -225,12 +226,12 @@ export default async function handler(req, res) {
 function fieldLabel(field) {
   return {
     temperature: '🌡 Temperatura', humidity: '💧 Humedad',
-    co2: '🫧 CO₂', pressure: '🔵 Presión',
+    co2: '🫧 CO₂', tvoc: '🧪 TVOC', pressure: '🔵 Presión',
     laeq: '🔊 Ruido LAeq', laimax: '📢 Ruido LAImax',
     battery: '🔋 Batería',
   }[field] || field;
 }
 
 function fieldUnit(field) {
-  return { temperature:'°C', humidity:'%', co2:'ppm', pressure:'hPa', laeq:'dB', laimax:'dB', battery:'%' }[field] || '';
+  return { temperature:'°C', humidity:'%', co2:'ppm', tvoc:'µg/m³', pressure:'hPa', laeq:'dB', laimax:'dB', battery:'%' }[field] || '';
 }
